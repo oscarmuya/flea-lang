@@ -1,0 +1,8 @@
+// print true && false;
+// TOADD: false
+
+// print true || false;
+// TOADD: true
+
+print !true;
+// EXPECTED: false

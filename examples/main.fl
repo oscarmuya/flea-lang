@@ -1,0 +1,12 @@
+// this is a comment!
+
+let  x = 10;
+
+{
+    let x = 20;
+    print x;
+}
+
+print x;
+
+// this is also comment!

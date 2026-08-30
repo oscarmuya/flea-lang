@@ -1,0 +1,19 @@
+program     ::= statement* EOF
+statement   ::= printStmt | letStmt | exprStmt | ifStmt | whileStmt | block 
+
+printStmt   ::= "print" equality ";"
+letStmt     ::= "let" expression ";"
+exprStmt    ::= expression ";"
+ifStmt      ::= "if" "(" equality ")" block ("else" block)?
+whileStmt   ::= "while" "(" equality ")" block
+block       ::= "{" statement* "}"
+
+expression  ::= assignment
+assignment  ::= IDENTIFIER "=" assignment | equality
+
+equality    ::= comparison (("==") comparison)?
+comparison  ::= term ((<" | ">" | "<=" | ">=") term)?
+term        ::= factor (("+" | "-") factor)*
+factor      ::= unary (("*" | "/") unary)*
+unary       ::= ("!" | "-") unary | primary
+primary     ::= NUMBER | STRING | IDENTIFIER | BOOL | "(" expression ")"

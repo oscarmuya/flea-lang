@@ -1,0 +1,11 @@
+let x = "oscar";
+
+let y = "muya";
+
+if (x == y){
+ print "hello oscar muya";
+} else {
+ print "who are you";
+}
+
+// EXPECTED: who are you

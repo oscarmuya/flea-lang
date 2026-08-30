@@ -1,0 +1,16 @@
+// Arithmetic
+print 200 + 150;
+// EXPECTED: 350
+
+print 200 - 150;
+// EXPECTED: 50
+
+print 200 * 150;
+// EXPECTED: 30000
+
+// print 200 / 150;
+// TOADD: 1.3333333333
+
+// print 200 % 150;
+// TOADD: 50
+

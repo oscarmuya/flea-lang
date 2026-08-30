@@ -1,0 +1,17 @@
+print 200 == 150;
+// EXPECTED: false
+
+print 200 != 150;
+// EXPECTED: true
+
+print 200 > 150;
+// EXPECTED: true
+
+print 200 < 150;
+// EXPECTED: false
+
+print 200 >= 200;
+// EXPECTED: true
+
+print 200 <= 150;
+// EXPECTED: false

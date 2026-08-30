@@ -1,0 +1,99 @@
+// ---- Arithmetic ----
+let x = 10;
+let y = 5;
+
+print x + y;
+// EXPECTED: 15
+
+print x - y;
+// EXPECTED: 5
+
+print x * y;
+// EXPECTED: 50
+
+print x / y;
+// EXPECTED: 2
+
+// ---- Comparison (single, non-chained) ----
+print x > y;
+// EXPECTED: true
+
+print x < y;
+// EXPECTED: false
+
+print x >= 10;
+// EXPECTED: true
+
+print x <= y;
+// EXPECTED: false
+
+// ---- Equality ----
+print x == y;
+// EXPECTED: false
+
+let same = x == x;
+print same;
+// EXPECTED: true
+
+// ---- Unary ----
+print -x;
+// EXPECTED: -10
+
+let eq = x == y;
+print !eq;
+// EXPECTED: true
+
+// ---- Assignment as expression (right-associative, chainable) ----
+let z = 0;
+z = x = 20;
+
+print z;
+// EXPECTED: 20
+
+print x;
+// EXPECTED: 20
+
+// ---- If / else ----
+if (x > y) {
+  print x;
+  // EXPECTED: 20
+} else {
+  print y;
+}
+
+if (x < y) {
+  print x;
+} else {
+  print y;
+  // EXPECTED: 5
+}
+
+// ---- While loop: sum 1 to 5 ----
+let i = 1;
+let sum = 0;
+while (i <= 5) {
+  sum = sum + i;
+  i = i + 1;
+}
+
+print sum;
+// EXPECTED: 15
+
+// ---- Nested block scoping ----
+let a = 1;
+{
+  let a = 2;
+  print a;
+  // EXPECTED: 2
+}
+
+print a;
+// EXPECTED: 1
+
+// ---- Strings ----
+let s = "hello";
+print s;
+// EXPECTED: hello
+
+print s == "hello";
+// EXPECTED: true

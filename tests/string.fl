@@ -1,0 +1,5 @@
+print "hello world";
+// EXPECTED: hello world
+
+print "hello" + " world";
+// EXPECTED: hello world

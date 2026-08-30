@@ -1,0 +1,14 @@
+let x = 5;
+
+let y = "hello " + "world";
+
+let z = "hello";
+
+print x;
+// EXPECTED: 5
+
+print y;
+// EXPECTED: hello world
+
+print z;
+// EXPECTED: hello

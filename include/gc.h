@@ -1,0 +1,4 @@
+#ifndef FLEA_GARBAGE_COLLECTOR_H
+#define FLEA_GARBAGE_COLLECTOR_H
+
+#endif
