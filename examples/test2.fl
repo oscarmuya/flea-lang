@@ -1,0 +1,31 @@
+!! this is me thinking what if i make this the 
+!! hardest language nobody cant understand
+
+* x -> 5;
+* y -> 10;
+* z -> #hello#;
+
+& process!;
+
+& handle_payment!amount,age {
+    = #This is me handling payment!#;
+    = #This is how i pring args % % !#, amount, age;
+}
+
+handle_payment!200,30;
+
+@ x < y {
+    = x;
+    x -> x + 1;
+    x +-> 1;
+}
+
+$ x <= 10 {
+    = #Yay its more!#;
+} > $ z == 11 {
+    = #Nay its less!#;
+} > {
+    = #Nothing Matched!#;
+}
+
+!! this is a comment
