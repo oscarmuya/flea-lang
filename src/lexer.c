@@ -52,14 +52,16 @@ Token *tokenize(const char *source, int *token_count) {
       }
 
       string[position] = '\0';
-      if (strcmp(string, "let") == 0) {
-        tokens[(*token_count)++].type = VALUE_LET;
-      } else if (strcmp(string, "if") == 0) {
-        tokens[(*token_count)++].type = VALUE_IF;
-      } else if (strcmp(string, "else") == 0) {
-        tokens[(*token_count)++].type = VALUE_ELSE;
-      } else if (strcmp(string, "while") == 0) {
-        tokens[(*token_count)++].type = VALUE_WHILE;
+      if (strcmp(string, "make") == 0) {
+        tokens[(*token_count)++].type = VALUE_MAKE;
+      } else if (strcmp(string, "be") == 0) {
+        tokens[(*token_count)++].type = VALUE_BE;
+      } else if (strcmp(string, "should") == 0) {
+        tokens[(*token_count)++].type = VALUE_SHOULD;
+      } else if (strcmp(string, "then") == 0) {
+        tokens[(*token_count)++].type = VALUE_THEN;
+      } else if (strcmp(string, "whilst") == 0) {
+        tokens[(*token_count)++].type = VALUE_WHILST;
       } else if (strcmp(string, "print") == 0) {
         tokens[(*token_count)++].type = VALUE_PRINT;
       } else if (strcmp(string, "true") == 0) {
@@ -169,14 +171,13 @@ Token *tokenize(const char *source, int *token_count) {
       tokens[*token_count].value.s = strdup(string);
       (*token_count)++;
     }
-    // = ==
+    //  ==
     else if (source[count] == '=') {
       // we check if next is also =
       if (source[count + 1] != '\0' && source[count + 1] == '=') {
         tokens[(*token_count)++].type = VALUE_EQUALS;
         count++;
-      } else
-        tokens[(*token_count)++].type = VALUE_ASSIGN;
+      }
     }
     // whitespace and new lines
     else if (source[count] == ' ' || source[count] == '\n') {
@@ -218,8 +219,8 @@ void visualize_tokens(Token *tokens, int *token_count) {
   for (size_t i = 0; i < (size_t)*token_count; i++) {
 
     switch (tokens[i].type) {
-    case VALUE_LET:
-      printf("LET\n");
+    case VALUE_MAKE:
+      printf("MAKE\n");
       break;
 
     case VALUE_IDENTIFIER:
@@ -238,8 +239,8 @@ void visualize_tokens(Token *tokens, int *token_count) {
       printf("BOOL(\"%d\")\n", tokens[i].value.b);
       break;
 
-    case VALUE_ASSIGN:
-      printf("ASSIGN: =\n");
+    case VALUE_BE:
+      printf("BE: =\n");
       break;
 
     case VALUE_PLUS:
@@ -258,16 +259,16 @@ void visualize_tokens(Token *tokens, int *token_count) {
       printf("ASTERIK: *\n");
       break;
 
-    case VALUE_IF:
-      printf("IF\n");
+    case VALUE_SHOULD:
+      printf("SHOULD\n");
       break;
 
-    case VALUE_ELSE:
-      printf("ELSE\n");
+    case VALUE_THEN:
+      printf("THEN\n");
       break;
 
-    case VALUE_WHILE:
-      printf("WHILE\n");
+    case VALUE_WHILST:
+      printf("WHILST\n");
       break;
 
     case VALUE_LEFT_PAREN:
@@ -339,8 +340,8 @@ void visualize_tokens(Token *tokens, int *token_count) {
 
 const char *token_type_to_string(TokenType type) {
   switch (type) {
-  case VALUE_LET:
-    return "VALUE_LET";
+  case VALUE_MAKE:
+    return "VALUE_MAKE";
   case VALUE_IDENTIFIER:
     return "VALUE_IDENTIFIER";
   case VALUE_NUMBER:
@@ -349,8 +350,8 @@ const char *token_type_to_string(TokenType type) {
     return "VALUE_STRING";
   case VALUE_BOOL:
     return "VALUE_BOOL";
-  case VALUE_ASSIGN:
-    return "VALUE_ASSIGN";
+  case VALUE_BE:
+    return "VALUE_BE";
   case VALUE_PLUS:
     return "VALUE_PLUS";
   case VALUE_MINUS:
@@ -359,12 +360,12 @@ const char *token_type_to_string(TokenType type) {
     return "VALUE_FORWARD_SLASH";
   case VALUE_ASTERIK:
     return "VALUE_ASTERIK";
-  case VALUE_IF:
-    return "VALUE_IF";
-  case VALUE_ELSE:
-    return "VALUE_ELSE";
-  case VALUE_WHILE:
-    return "VALUE_WHILE";
+  case VALUE_SHOULD:
+    return "VALUE_SHOULD";
+  case VALUE_THEN:
+    return "VALUE_THEN";
+  case VALUE_WHILST:
+    return "VALUE_WHILST";
   case VALUE_LEFT_PAREN:
     return "VALUE_LEFT_PAREN";
   case VALUE_RIGHT_PAREN:

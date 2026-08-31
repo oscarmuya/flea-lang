@@ -1,8 +1,8 @@
-let x = 5;
+make x be 5;
 
-let y = "hello " + "world";
+make y be "hello " + "world";
 
-let z = "hello";
+make z be "hello";
 
 print x;
 // EXPECTED: 5

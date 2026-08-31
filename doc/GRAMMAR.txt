@@ -1,15 +1,15 @@
 program     ::= statement* EOF
-statement   ::= printStmt | letStmt | exprStmt | ifStmt | whileStmt | block 
+statement   ::= printStmt | makeStmt | exprStmt | shouldStmt | whilstStmt | block 
 
 printStmt   ::= "print" equality ";"
-letStmt     ::= "let" expression ";"
+makeStmt    ::= "make" expression ";"
 exprStmt    ::= expression ";"
-ifStmt      ::= "if" "(" equality ")" block ("else" block)?
-whileStmt   ::= "while" "(" equality ")" block
+shouldStmt  ::= "should" "(" equality ")" block ("then" block)?
+whilstStmt  ::= "whilst" "(" equality ")" block
 block       ::= "{" statement* "}"
 
 expression  ::= assignment
-assignment  ::= IDENTIFIER "=" assignment | equality
+assignment  ::= IDENTIFIER "be" assignment | equality
 
 equality    ::= comparison (("==" | "!=") comparison)?
 comparison  ::= term ((<" | ">" | "<=" | ">=") term)?

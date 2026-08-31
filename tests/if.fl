@@ -1,10 +1,10 @@
-let x = "oscar";
+make x be "oscar";
 
-let y = "muya";
+make y be "muya";
 
-if (x == y){
+should (x == y){
  print "hello oscar muya";
-} else {
+} then {
  print "who are you";
 }
 

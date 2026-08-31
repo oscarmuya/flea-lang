@@ -1,6 +1,6 @@
 // ---- Arithmetic ----
-let x = 10;
-let y = 5;
+make x be 10;
+make y be 5;
 
 print x + y;
 // EXPECTED: 15
@@ -31,7 +31,7 @@ print x <= y;
 print x == y;
 // EXPECTED: false
 
-let same = x == x;
+make same be x == x;
 print same;
 // EXPECTED: true
 
@@ -39,13 +39,13 @@ print same;
 print -x;
 // EXPECTED: -10
 
-let eq = x == y;
+make eq be x == y;
 print !eq;
 // EXPECTED: true
 
 // ---- Assignment as expression (right-associative, chainable) ----
-let z = 0;
-z = x = 20;
+make z be 0;
+z be x be 20;
 
 print z;
 // EXPECTED: 20
@@ -53,36 +53,36 @@ print z;
 print x;
 // EXPECTED: 20
 
-// ---- If / else ----
-if (x > y) {
+// ---- should / should ----
+should (x > y) {
   print x;
   // EXPECTED: 20
-} else {
+} then {
   print y;
 }
 
-if (x < y) {
+should (x < y) {
   print x;
-} else {
+} then {
   print y;
   // EXPECTED: 5
 }
 
-// ---- While loop: sum 1 to 5 ----
-let i = 1;
-let sum = 0;
-while (i <= 5) {
-  sum = sum + i;
-  i = i + 1;
+// ---- whilst loop: sum 1 to 5 ----
+make i be 1;
+make sum be 0;
+whilst (i <= 5) {
+  sum be sum + i;
+  i be i + 1;
 }
 
 print sum;
 // EXPECTED: 15
 
 // ---- Nested block scoping ----
-let a = 1;
+make a be 1;
 {
-  let a = 2;
+  make a be 2;
   print a;
   // EXPECTED: 2
 }
@@ -91,7 +91,7 @@ print a;
 // EXPECTED: 1
 
 // ---- Strings ----
-let s = "hello";
+make s be "hello";
 print s;
 // EXPECTED: hello
 

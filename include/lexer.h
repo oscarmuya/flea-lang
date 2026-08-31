@@ -1,28 +1,28 @@
 #ifndef FLEA_LEXER_H
 #define FLEA_LEXER_H
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 extern const int VARIABLE_LENGTH;
 
 typedef enum {
-  VALUE_LET,
+  VALUE_MAKE,
   VALUE_IDENTIFIER,
 
   VALUE_NUMBER,
   VALUE_STRING,
   VALUE_BOOL,
 
-  VALUE_ASSIGN,
+  VALUE_BE,
   VALUE_PLUS,
   VALUE_MINUS,
   VALUE_FORWARD_SLASH,
   VALUE_ASTERIK,
 
-  VALUE_IF,
-  VALUE_ELSE,
-  VALUE_WHILE,
+  VALUE_SHOULD,
+  VALUE_THEN,
+  VALUE_WHILST,
 
   VALUE_LEFT_PAREN,
   VALUE_RIGHT_PAREN,

@@ -43,16 +43,16 @@ ASTNode *parse_statement(Parser *parser) {
   stmt = parse_print_stmt(parser);
   if (stmt != NULL)
     return stmt;
-  stmt = parse_let_stmt(parser);
+  stmt = parse_make_stmt(parser);
   if (stmt != NULL)
     return stmt;
   stmt = parse_expr_stmt(parser);
   if (stmt != NULL)
     return stmt;
-  stmt = parse_if_stmt(parser);
+  stmt = parse_should_stmt(parser);
   if (stmt != NULL)
     return stmt;
-  stmt = parse_while_stmt(parser);
+  stmt = parse_whilst_stmt(parser);
   if (stmt != NULL)
     return stmt;
   stmt = parse_comment(parser);
@@ -92,22 +92,22 @@ ASTNode *parse_print_stmt(Parser *parser) {
   return stmt;
 }
 
-// letStmt -> "let" expression ";"
-ASTNode *parse_let_stmt(Parser *parser) {
-  if (peek(parser)->type != VALUE_LET)
+// makeStmt -> "make" expression ";"
+ASTNode *parse_make_stmt(Parser *parser) {
+  if (peek(parser)->type != VALUE_MAKE)
     return NULL;
   advance(parser);
 
   ASTNode *stmt = arena_alloc(parser->arena, sizeof(*stmt));
-  stmt->type = NODE_LET;
+  stmt->type = NODE_MAKE;
 
   ASTNode *expression = parse_expression(parser);
   if (expression == NULL) {
     throw_parser_error("Error: expected expression found NULL");
   }
 
-  stmt->as.let.identifier = expression->as.assign.identifier;
-  stmt->as.let.value = expression->as.assign.value;
+  stmt->as.make.identifier = expression->as.be.identifier;
+  stmt->as.make.value = expression->as.be.value;
 
   // expect ;
   expect(parser, VALUE_SEMICOLON);
@@ -125,53 +125,53 @@ ASTNode *parse_expr_stmt(Parser *parser) {
   return stmt;
 }
 
-// ifStmt -> "if" "(" equality ")" block ("else" block)?
-ASTNode *parse_if_stmt(Parser *parser) {
-  if (peek(parser)->type != VALUE_IF)
+// shouldStmt -> "should" "(" equality ")" block ("then" block)?
+ASTNode *parse_should_stmt(Parser *parser) {
+  if (peek(parser)->type != VALUE_SHOULD)
     return NULL;
   advance(parser);
   // expect (
   expect(parser, VALUE_LEFT_PAREN);
 
   ASTNode *stmt = arena_alloc(parser->arena, sizeof(*stmt));
-  stmt->type = NODE_IF;
+  stmt->type = NODE_SHOULD;
 
   ASTNode *eq = parse_equality(parser);
   if (eq == NULL)
-    throw_parser_error("Error: expected equality in if statement");
-  stmt->as.if_stmt.condition = eq;
+    throw_parser_error("Error: expected equality in should statement");
+  stmt->as.should_stmt.condition = eq;
 
   // expect )
   expect(parser, VALUE_RIGHT_PAREN);
 
-  stmt->as.if_stmt.then_branch = parse_block(parser);
+  stmt->as.should_stmt.then_branch = parse_block(parser);
 
   // see if we have else
-  if (peek(parser)->type == VALUE_ELSE) {
+  if (peek(parser)->type == VALUE_THEN) {
     advance(parser);
-    stmt->as.if_stmt.else_branch = parse_block(parser);
+    stmt->as.should_stmt.else_branch = parse_block(parser);
   }
   return stmt;
 }
 
-// whileStmt -> "while" "(" equality ")" block
-ASTNode *parse_while_stmt(Parser *parser) {
-  if (peek(parser)->type != VALUE_WHILE)
+// whilstStmt -> "whilst" "(" equality ")" block
+ASTNode *parse_whilst_stmt(Parser *parser) {
+  if (peek(parser)->type != VALUE_WHILST)
     return NULL;
   advance(parser);
   expect(parser, VALUE_LEFT_PAREN);
 
   ASTNode *stmt = arena_alloc(parser->arena, sizeof(*stmt));
-  stmt->type = NODE_WHILE;
+  stmt->type = NODE_WHILST;
 
   ASTNode *eq = parse_equality(parser);
   if (eq == NULL)
     throw_parser_error("Error: expected equality in while statement");
-  stmt->as.while_stmt.condition = eq;
+  stmt->as.whilst_stmt.condition = eq;
 
   // expect )
   expect(parser, VALUE_RIGHT_PAREN);
-  stmt->as.while_stmt.body = parse_block(parser);
+  stmt->as.whilst_stmt.body = parse_block(parser);
 
   return stmt;
 }
@@ -217,26 +217,26 @@ ASTNode *parse_expression(Parser *parser) { return parse_assignment(parser); }
 ASTNode *parse_assignment(Parser *parser) {
   if (peek(parser)->type == VALUE_IDENTIFIER) {
     Token *identifier = advance(parser);
-    if (peek(parser)->type != VALUE_ASSIGN) {
+    if (peek(parser)->type != VALUE_BE) {
       parser->current--;
       return parse_equality(parser);
     }
     ASTNode *assgn = arena_alloc(parser->arena, sizeof(*assgn));
 
-    assgn->type = NODE_ASSIGN;
-    assgn->as.assign.identifier = arena_alloc(parser->arena, sizeof(ASTNode));
-    assgn->as.assign.identifier->type = NODE_IDENTIFIER;
+    assgn->type = NODE_BE;
+    assgn->as.be.identifier = arena_alloc(parser->arena, sizeof(ASTNode));
+    assgn->as.be.identifier->type = NODE_IDENTIFIER;
 
     char *s = identifier->value.s;
     size_t len = strlen(s);
-    assgn->as.assign.identifier->as.identifier.value =
+    assgn->as.be.identifier->as.identifier.value =
         arena_alloc(parser->arena, len + 1);
-    memcpy(assgn->as.assign.identifier->as.identifier.value, s, len);
-    assgn->as.assign.identifier->as.identifier.value[len] = '\0';
+    memcpy(assgn->as.be.identifier->as.identifier.value, s, len);
+    assgn->as.be.identifier->as.identifier.value[len] = '\0';
 
-    expect(parser, VALUE_ASSIGN);
+    expect(parser, VALUE_BE);
     ASTNode *value = parse_assignment(parser);
-    assgn->as.assign.value = value;
+    assgn->as.be.value = value;
 
     return assgn;
   }
@@ -456,18 +456,18 @@ const char *node_type_to_string(NodeType type) {
     return "NODE_UNARY";
   case NODE_BINARY:
     return "NODE_BINARY";
-  case NODE_ASSIGN:
-    return "NODE_ASSIGN";
-  case NODE_LET:
-    return "NODE_LET";
+  case NODE_BE:
+    return "NODE_BE";
+  case NODE_MAKE:
+    return "NODE_MAKE";
   case NODE_BLOCK:
     return "NODE_BLOCK";
   case NODE_PRINT:
     return "NODE_PRINT";
-  case NODE_IF:
-    return "NODE_IF";
-  case NODE_WHILE:
-    return "NODE_WHILE";
+  case NODE_SHOULD:
+    return "NODE_SHOULD";
+  case NODE_WHILST:
+    return "NODE_WHILST";
   default:
     return "INVALID_NODE_TYPE";
   }

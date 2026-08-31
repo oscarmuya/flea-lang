@@ -49,11 +49,11 @@ Value eval(ASTNode *node, Environment *env, int block_id) {
     break;
   }
     // INFO: My lang my choice i will evaluate an assign as an expression like C
-  case NODE_ASSIGN: {
+  case NODE_BE: {
     ret = eval_expr(node, env, block_id);
     break;
   }
-  case NODE_LET: {
+  case NODE_MAKE: {
     execute_stmt(node, env, block_id);
     break;
   }
@@ -79,11 +79,11 @@ Value eval(ASTNode *node, Environment *env, int block_id) {
       printf("NULL\n");
     break;
   }
-  case NODE_IF: {
+  case NODE_SHOULD: {
     execute_stmt(node, env, block_id);
     break;
   }
-  case NODE_WHILE: {
+  case NODE_WHILST: {
     execute_stmt(node, env, block_id);
     break;
   }
@@ -137,15 +137,15 @@ Value eval_expr(ASTNode *node, Environment *env, int block_id) {
       }
     }
   } break;
-  case NODE_ASSIGN: {
+  case NODE_BE: {
     // lets check if the value exists
     Value *identifer =
-        get_value(env, node->as.assign.identifier->as.identifier.value);
+        get_value(env, node->as.be.identifier->as.identifier.value);
     if (identifer == NULL)
       throw_interpreter_error("Error: variable of name (%s) does not exist",
-                              node->as.assign.identifier->as.identifier.value);
-    Value new_value = eval(node->as.assign.value, env, block_id);
-    value = *update_value(env, node->as.assign.identifier->as.identifier.value,
+                              node->as.be.identifier->as.identifier.value);
+    Value new_value = eval(node->as.be.value, env, block_id);
+    value = *update_value(env, node->as.be.identifier->as.identifier.value,
                           new_value, block_id);
 
   } break;
@@ -159,37 +159,37 @@ Value eval_expr(ASTNode *node, Environment *env, int block_id) {
 void execute_stmt(ASTNode *node, Environment *env, int block_id) {
   switch (node->type) {
   // we initialize the value and pass to assign
-  case NODE_LET: {
+  case NODE_MAKE: {
     Value *identifier = get_value_with_block_id(
-        env, node->as.let.identifier->as.identifier.value, block_id);
+        env, node->as.make.identifier->as.identifier.value, block_id);
     // if value is available we scream you cant reinitialize
     if (identifier != NULL)
       throw_interpreter_error(
           "Error: you cant re-initialize block scoped value");
-    Value val = eval(node->as.let.value, env, block_id);
-    create_value(env, node->as.assign.identifier->as.identifier.value, val,
+    Value val = eval(node->as.make.value, env, block_id);
+    create_value(env, node->as.make.identifier->as.identifier.value, val,
                  block_id);
 
   } break;
-  case NODE_IF: {
-    Value condition = eval(node->as.if_stmt.condition, env, block_id);
+  case NODE_SHOULD: {
+    Value condition = eval(node->as.should_stmt.condition, env, block_id);
     if (condition.type != VAL_BOOL)
       throw_interpreter_error(
           "Error: while condition does not evaluate to a boolean");
     if (condition.as.boolean == true) {
-      eval(node->as.if_stmt.then_branch, env, block_id);
+      eval(node->as.should_stmt.then_branch, env, block_id);
     } else {
-      eval(node->as.if_stmt.else_branch, env, block_id);
+      eval(node->as.should_stmt.else_branch, env, block_id);
     }
   } break;
-  case NODE_WHILE: {
-    Value condition = eval(node->as.while_stmt.condition, env, block_id);
+  case NODE_WHILST: {
+    Value condition = eval(node->as.whilst_stmt.condition, env, block_id);
     if (condition.type != VAL_BOOL)
       throw_interpreter_error(
           "Error: while condition does not evaluate to a boolean");
     while (condition.as.boolean == true) {
-      eval(node->as.while_stmt.body, env, block_id);
-      condition = eval(node->as.while_stmt.condition, env, block_id);
+      eval(node->as.whilst_stmt.body, env, block_id);
+      condition = eval(node->as.whilst_stmt.condition, env, block_id);
     }
   } break;
   default:

@@ -17,14 +17,14 @@ typedef enum {
   NODE_UNARY,
   NODE_BINARY,
 
-  NODE_ASSIGN,
-  NODE_LET,
+  NODE_MAKE,
+  NODE_BE,
   NODE_BLOCK,
   NODE_PRINT,
   NODE_COMMENT,
 
-  NODE_IF,
-  NODE_WHILE,
+  NODE_SHOULD,
+  NODE_WHILST,
 } NodeType;
 
 typedef struct ASTNode ASTNode;
@@ -64,12 +64,12 @@ typedef struct {
 typedef struct {
   ASTNode *identifier;
   ASTNode *value;
-} AssignNode;
+} BeNode;
 
 typedef struct {
   ASTNode *identifier;
   ASTNode *value;
-} LetNode;
+} MakeNode;
 
 typedef struct {
   ASTNode **statements;
@@ -88,12 +88,12 @@ typedef struct {
   ASTNode *condition;
   ASTNode *then_branch;
   ASTNode *else_branch;
-} IfNode;
+} ShouldNode;
 
 typedef struct {
   ASTNode *condition;
   ASTNode *body;
-} WhileNode;
+} WhilstNode;
 
 struct ASTNode {
   NodeType type;
@@ -108,14 +108,14 @@ struct ASTNode {
     UnaryNode unary;
     BinaryNode binary;
 
-    AssignNode assign;
-    LetNode let;
+    BeNode be;
+    MakeNode make;
     BlockNode block;
     PrintNode print;
     CommentNode comment;
 
-    IfNode if_stmt;
-    WhileNode while_stmt;
+    ShouldNode should_stmt;
+    WhilstNode whilst_stmt;
   } as;
 };
 
@@ -156,17 +156,17 @@ ASTNode *parse_print_stmt(Parser *parser);
 // // [anythign]
 ASTNode *parse_comment(Parser *parser);
 
-// letStmt -> "let" expression ";"
-ASTNode *parse_let_stmt(Parser *parser);
+// makeStmt -> "make" expression ";"
+ASTNode *parse_make_stmt(Parser *parser);
 
 // exprStmt -> expression ";"
 ASTNode *parse_expr_stmt(Parser *parser);
 
-// ifStmt -> "if" "(" equality ")" block ("else" block)?
-ASTNode *parse_if_stmt(Parser *parser);
+// shouldStmt -> "should" "(" equality ")" block ("then" block)?
+ASTNode *parse_should_stmt(Parser *parser);
 
-// whileStmt -> "while" "(" equality ")" block
-ASTNode *parse_while_stmt(Parser *parser);
+// whilstStmt -> "whilst" "(" equality ")" block
+ASTNode *parse_whilst_stmt(Parser *parser);
 
 // block -> "{" statement* "}"
 ASTNode *parse_block(Parser *parser);

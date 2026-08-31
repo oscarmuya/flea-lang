@@ -3,18 +3,18 @@
 #### Made a programming and its compiler in C in a weekend with ZERO AI.
 
 ```fl
-let x = 5;
-let y = 10;
-let z = "hello" + " world!";
+make x be 5;
+make y be 10;
+make z be "hello" + " world!";
 
-while (x < y) {
+whilst (x < y) {
     print x;
-    x = x + 1;
+    x be x + 1;
 }
 
-if (x <= 10){
+should (x <= 10){
     print "Yay its more!";
-} else {
+} then {
     print "Nay its less!";
 }
 

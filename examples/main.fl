@@ -1,16 +1,16 @@
 // this is a comment!
 
-let  x = 10;
-let y = 2 + 3 * 4 - 1;
+make x be 10;
+make y be 2 + 3 * 4 - 1;
 print y;
 
 {
-    let x = 20;
+    make x be 20;
 
     {
-        let x = 30;
+        make x be 30;
         print x;
-        x = 40;
+        x be 40;
         print x;
     }
 
