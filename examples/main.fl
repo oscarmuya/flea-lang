@@ -1,10 +1,21 @@
 // this is a comment!
 
 let  x = 10;
+let y = 2 + 3 * 4 - 1;
+print y;
 
 {
     let x = 20;
+
+    {
+        let x = 30;
+        print x;
+        x = 40;
+        print x;
+    }
+
     print x;
+
 }
 
 print x;

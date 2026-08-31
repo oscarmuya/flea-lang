@@ -7,6 +7,14 @@ while (x < y) {
     x = x + 1;
 }
 
+func process();
+
+func process(amount,count){
+
+}
+
+process(200,300);
+
 if (x <= 10){
     print "Yay its more!";
 } else {
