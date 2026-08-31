@@ -5,6 +5,9 @@ print 200 + 150;
 print 200 - 150;
 // EXPECTED: 50
 
+print 2 + 3 * 4 - 1;
+// EXPECTED: 13
+
 print 200 * 150;
 // EXPECTED: 30000
 

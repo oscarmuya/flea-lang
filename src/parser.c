@@ -243,7 +243,7 @@ ASTNode *parse_assignment(Parser *parser) {
   return parse_equality(parser);
 }
 
-// equality -> comparison (("==") comparison)?
+// equality -> comparison (("==" | "!=") comparison)?
 ASTNode *parse_equality(Parser *parser) {
   ASTNode *left = parse_comparison(parser);
   if (left == NULL)
@@ -327,30 +327,19 @@ ASTNode *parse_term(Parser *parser) {
   if (left == NULL)
     return NULL;
 
-  ASTNode *term = NULL;
-
-  switch (peek(parser)->type) {
-  case VALUE_PLUS:
-    term = arena_alloc(parser->arena, sizeof(*term));
+  TokenType type = peek(parser)->type;
+  while (type == VALUE_PLUS || type == VALUE_MINUS) {
+    ASTNode *term = arena_alloc(parser->arena, sizeof(*term));
     term->type = NODE_BINARY;
-    term->as.binary.op = VALUE_PLUS;
-    break;
-  case VALUE_MINUS:
-    term = arena_alloc(parser->arena, sizeof(*term));
-    term->type = NODE_BINARY;
-    term->as.binary.op = VALUE_MINUS;
-    break;
-  default:
-    break;
-  }
-  if (term != NULL) {
+    term->as.binary.op = type;
     advance(parser);
     ASTNode *right = parse_factor(parser);
     if (right == NULL)
       throw_parser_error("Error: right factor needed for term");
     term->as.binary.left = left;
     term->as.binary.right = right;
-    return term;
+    left = term;
+    type = peek(parser)->type;
   }
   return left;
 }
@@ -361,30 +350,19 @@ ASTNode *parse_factor(Parser *parser) {
   if (left == NULL)
     return NULL;
 
-  ASTNode *factor = NULL;
-
-  switch (peek(parser)->type) {
-  case VALUE_ASTERIK:
-    factor = arena_alloc(parser->arena, sizeof(*factor));
+  TokenType type = peek(parser)->type;
+  while (type == VALUE_ASTERIK || type == VALUE_FORWARD_SLASH) {
+    ASTNode *factor = arena_alloc(parser->arena, sizeof(*factor));
     factor->type = NODE_BINARY;
-    factor->as.binary.op = VALUE_ASTERIK;
-    break;
-  case VALUE_FORWARD_SLASH:
-    factor = arena_alloc(parser->arena, sizeof(*factor));
-    factor->type = NODE_BINARY;
-    factor->as.binary.op = VALUE_FORWARD_SLASH;
-    break;
-  default:
-    break;
-  }
-  if (factor != NULL) {
+    factor->as.binary.op = type;
     advance(parser);
     ASTNode *right = parse_unary(parser);
     if (right == NULL)
       throw_parser_error("Error: right unary needed for factor");
     factor->as.binary.left = left;
     factor->as.binary.right = right;
-    return factor;
+    left = factor;
+    type = peek(parser)->type;
   }
   return left;
 }
