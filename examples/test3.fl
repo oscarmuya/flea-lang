@@ -1,0 +1,29 @@
+// still figuring out this is me trying to imagine
+// what if i make this one of the most easiest and 
+// english like language !IGNORE PYTHON!
+
+make x be 5;
+make y be 10;
+make z be "hello";
+
+do process();
+
+do handle_payment(amount,age){
+
+}
+
+handle_payment(200,20);
+
+whilst (x < y) {
+    print x;
+    x be x + 1;
+    x +be 1;
+}
+
+should (x <= 10){
+    print "Yay its more!";
+} then should (z == 11) {
+    print "Nay its less!";
+} then {
+    print "Nothing Matched!";
+}
