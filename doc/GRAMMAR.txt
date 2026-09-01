@@ -1,5 +1,8 @@
 program     ::= statement* EOF
-statement   ::= printStmt | makeStmt | exprStmt | shouldStmt | whilstStmt | block 
+statement   ::= printStmt | makeStmt | makeFnStmt | callFnStmt | exprStmt | shouldStmt | whilstStmt | block
+
+makeFnStmt  ::= "make" IDENTIFER "(" paramList ")" block
+callFnStmt  ::= IDENTIFIER "(" argList ")" ";"
 
 printStmt   ::= "print" equality ";"
 makeStmt    ::= "make" expression ";"
@@ -7,6 +10,9 @@ exprStmt    ::= expression ";"
 shouldStmt  ::= "should" "(" equality ")" block ("then" block)?
 whilstStmt  ::= "whilst" "(" equality ")" block
 block       ::= "{" statement* "}"
+
+paramList   ::= (IDENTIFER ("," IDENTIFER)*)?
+argList     ::= (expression ("," expression)*)?
 
 expression  ::= assignment
 assignment  ::= IDENTIFIER "be" assignment | equality

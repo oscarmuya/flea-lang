@@ -2,10 +2,11 @@
 #define FLEA_STORE_H
 
 #include "arena.h"
+#include "parser.h"
 #include <stdbool.h>
 #include <stdint.h>
 
-typedef enum { VAL_NUMBER, VAL_STRING, VAL_BOOL, VAL_NIL } ValueType;
+typedef enum { VAL_NUMBER, VAL_STRING, VAL_BOOL, VAL_NIL, VAL_FN } ValueType;
 
 typedef struct {
   ValueType type;
@@ -13,6 +14,7 @@ typedef struct {
     int32_t integer;
     char *string;
     bool boolean;
+    MakeFnNode *fn;
   } as;
 } Value;
 

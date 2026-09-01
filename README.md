@@ -18,5 +18,12 @@ should (x <= 10){
     print "Nay its less!";
 }
 
+make pay(amount, count) {
+    print "i am paying";
+    print amount + count;
+}
+
+pay(200, 20);
+
 // this is a comment
 ```

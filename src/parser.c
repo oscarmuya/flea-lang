@@ -43,6 +43,12 @@ ASTNode *parse_statement(Parser *parser) {
   stmt = parse_print_stmt(parser);
   if (stmt != NULL)
     return stmt;
+  stmt = parse_make_fn_stmt(parser);
+  if (stmt != NULL)
+    return stmt;
+  stmt = parse_call_fn_stmt(parser);
+  if (stmt != NULL)
+    return stmt;
   stmt = parse_make_stmt(parser);
   if (stmt != NULL)
     return stmt;
@@ -176,6 +182,122 @@ ASTNode *parse_whilst_stmt(Parser *parser) {
   return stmt;
 }
 
+// makeFnStmt  ::= "make" IDENTIFER "(" paramList ")" block
+ASTNode *parse_make_fn_stmt(Parser *parser) {
+  // we look ahead and see if this is a function making
+  if (peek(parser)->type != VALUE_MAKE || look_ahead(parser, 2) == NULL ||
+      look_ahead(parser, 2)->type != VALUE_LEFT_PAREN)
+    return NULL;
+  advance(parser);
+  ASTNode *identifier = parse_primary(parser);
+  if (identifier == NULL)
+    throw_parser_error("Error: function name is required");
+
+  ASTNode *fn = arena_alloc(parser->arena, sizeof(*fn));
+  fn->type = NODE_MAKE_FN;
+  fn->as.make_fn_stmt.fn_name = identifier;
+
+  expect(parser, VALUE_LEFT_PAREN);
+  fn->as.make_fn_stmt.params = parse_param_list(parser);
+  expect(parser, VALUE_RIGHT_PAREN);
+  ASTNode *body = parse_block(parser);
+  fn->as.make_fn_stmt.body = body;
+  return fn;
+}
+
+// callFnStmt  ::= IDENTIFIER "(" argList ")"
+ASTNode *parse_call_fn_stmt(Parser *parser) {
+  // we lookahead for the paren
+  if (peek(parser)->type != VALUE_IDENTIFIER || look_ahead(parser, 1) == NULL ||
+      look_ahead(parser, 1)->type != VALUE_LEFT_PAREN)
+    return NULL;
+  ASTNode *identifier = parse_primary(parser);
+  if (identifier == NULL)
+    throw_parser_error("Error: function name is required");
+
+  ASTNode *fn = arena_alloc(parser->arena, sizeof(*fn));
+  fn->type = NODE_CALL_FN;
+  fn->as.call_fn_stmt.fn_name = identifier;
+
+  expect(parser, VALUE_LEFT_PAREN);
+  fn->as.call_fn_stmt.args = parse_arg_list(parser);
+  expect(parser, VALUE_RIGHT_PAREN);
+  expect(parser, VALUE_SEMICOLON);
+  return fn;
+}
+
+// paramList   ::= (IDENTIFER ("," IDENTIFER)*)?
+ASTNode *parse_param_list(Parser *parser) {
+  size_t count = 0;
+  // INFO: dont know if im wasting memory here but whatever man
+  size_t capacity = 8;
+
+  ASTNode *params = arena_alloc(parser->arena, sizeof(*params));
+  params->type = NODE_PARAMS;
+  params->as.params.params =
+      arena_alloc(parser->arena, capacity * sizeof(params->as.params.params));
+
+  ASTNode *identifier = parse_primary(parser);
+  if (identifier == NULL) {
+    params->as.params.count = count;
+    return params;
+  }
+  params->as.params.params[count++] = identifier;
+  while (peek(parser)->type == VALUE_COMMA) {
+    if (count >= capacity) {
+      size_t prev = capacity * sizeof(params->as.params.params);
+      capacity *= 2;
+      params->as.params.params =
+          arena_realloc(parser->arena, params->as.params.params, prev,
+                        capacity * sizeof(params->as.params.params));
+    }
+    advance(parser);
+    ASTNode *prim = parse_primary(parser);
+    // if it is null they have added an extra comm
+    if (prim == NULL)
+      throw_parser_error("Error: extra comma found in function params");
+    params->as.params.params[count++] = prim;
+  }
+
+  params->as.params.count = count;
+  return params;
+}
+
+// argList     ::= (expression ("," expression)*)?
+ASTNode *parse_arg_list(Parser *parser) {
+  size_t count = 0;
+  size_t capacity = 8;
+
+  ASTNode *args = arena_alloc(parser->arena, sizeof(*args));
+  args->as.args.args =
+      arena_alloc(parser->arena, capacity * sizeof(args->as.args.args));
+  args->type = NODE_ARGS;
+
+  ASTNode *exp = parse_expression(parser);
+  if (exp == NULL) {
+    args->as.args.count = count;
+    return args;
+  }
+  args->as.args.args[count++] = exp;
+  while (peek(parser)->type == VALUE_COMMA) {
+    if (count >= capacity) {
+      size_t prev = capacity * sizeof(args->as.args.args);
+      capacity *= 2;
+      args->as.args.args =
+          arena_realloc(parser->arena, args->as.args.args, prev,
+                        capacity * sizeof(args->as.args.args));
+    }
+    advance(parser);
+    exp = parse_expression(parser);
+    // if it is null they have added an extra comm
+    if (exp == NULL)
+      throw_parser_error("Error: extra comma found in function args");
+    args->as.args.args[count++] = exp;
+  }
+  args->as.args.count = count;
+  return args;
+}
+
 // block -> "{" statement* "}"
 ASTNode *parse_block(Parser *parser) {
   if (peek(parser)->type != VALUE_LEFT_BRACE)
@@ -216,11 +338,10 @@ ASTNode *parse_expression(Parser *parser) { return parse_assignment(parser); }
 // assignment -> IDENTIFIER "=" assignment | equality
 ASTNode *parse_assignment(Parser *parser) {
   if (peek(parser)->type == VALUE_IDENTIFIER) {
-    Token *identifier = advance(parser);
-    if (peek(parser)->type != VALUE_BE) {
-      parser->current--;
+    if (look_ahead(parser, 1)->type != VALUE_BE) {
       return parse_equality(parser);
     }
+    Token *identifier = advance(parser);
     ASTNode *assgn = arena_alloc(parser->arena, sizeof(*assgn));
 
     assgn->type = NODE_BE;
@@ -438,6 +559,11 @@ Token *expect(Parser *parser, TokenType expected) {
       token_type_to_string(parser->tokens[parser->current].type));
 }
 Token *peek(Parser *parser) { return &parser->tokens[parser->current]; }
+Token *look_ahead(Parser *parser, size_t steps) {
+  if ((size_t)parser->current + steps >= (size_t)parser->total)
+    return NULL;
+  return &parser->tokens[(size_t)parser->current + steps];
+}
 bool is_at_end(Parser *parser) { return parser->current >= parser->total; }
 
 const char *node_type_to_string(NodeType type) {

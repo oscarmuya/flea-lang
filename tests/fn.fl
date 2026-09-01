@@ -1,12 +1,10 @@
-// this is a comment!
-
 make x be 10;
 
 make pay(amount,count){
     print "i am paying";
+    // EXPECTED: i am paying
     print amount + count;
+    // EXPECTED: 220
 }
 
 pay(200,20);
-
-// this is also comment!

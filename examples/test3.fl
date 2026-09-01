@@ -6,9 +6,9 @@ make x be 5;
 make y be 10;
 make z be "hello";
 
-do process();
+make process();
 
-do handle_payment(amount,age){
+make handle_payment(amount,age){
 
 }
 

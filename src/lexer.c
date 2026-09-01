@@ -116,6 +116,8 @@ Token *tokenize(const char *source, int *token_count) {
       tokens[(*token_count)++].type = VALUE_RIGHT_BRACE;
     else if (source[count] == ';')
       tokens[(*token_count)++].type = VALUE_SEMICOLON;
+    else if (source[count] == ',')
+      tokens[(*token_count)++].type = VALUE_COMMA;
     else if (source[count] == '!') {
       // we check if next is also !=
       if (source[count + 1] != '\0' && source[count + 1] == '=') {
@@ -323,6 +325,10 @@ void visualize_tokens(Token *tokens, int *token_count) {
       printf("COMMENT(%s)\n", tokens[i].value.s);
       break;
 
+    case VALUE_COMMA:
+      printf("COMMA: ,\n");
+      break;
+
     case VALUE_SEMICOLON:
       printf("SEMICOLON: ;\n");
       break;
@@ -392,6 +398,8 @@ const char *token_type_to_string(TokenType type) {
     return "VALUE_PRINT";
   case VALUE_COMMENT:
     return "VALUE_COMMENT";
+  case VALUE_COMMA:
+    return "VALUE_COMMA";
   case VALUE_SEMICOLON:
     return "VALUE_SEMICOLON";
   case VALUE_UNKNOWN:

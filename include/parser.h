@@ -25,6 +25,10 @@ typedef enum {
 
   NODE_SHOULD,
   NODE_WHILST,
+  NODE_MAKE_FN,
+  NODE_CALL_FN,
+  NODE_PARAMS,
+  NODE_ARGS
 } NodeType;
 
 typedef struct ASTNode ASTNode;
@@ -95,6 +99,27 @@ typedef struct {
   ASTNode *body;
 } WhilstNode;
 
+typedef struct {
+  ASTNode *fn_name;
+  ASTNode *params;
+  ASTNode *body;
+} MakeFnNode;
+
+typedef struct {
+  ASTNode *args;
+  ASTNode *fn_name;
+} CallFnNode;
+
+typedef struct {
+  ASTNode **params;
+  size_t count;
+} ParamsListNode;
+
+typedef struct {
+  ASTNode **args;
+  size_t count;
+} ArgsListNode;
+
 struct ASTNode {
   NodeType type;
   union {
@@ -116,6 +141,11 @@ struct ASTNode {
 
     ShouldNode should_stmt;
     WhilstNode whilst_stmt;
+
+    MakeFnNode make_fn_stmt;
+    CallFnNode call_fn_stmt;
+    ParamsListNode params;
+    ArgsListNode args;
   } as;
 };
 
@@ -141,6 +171,7 @@ Token *expect(Parser *parsr, TokenType expected);
  * A function to look at the current token without consuming it.
  **/
 Token *peek(Parser *parser);
+Token *look_ahead(Parser *parser, size_t steps);
 bool is_at_end(Parser *parser);
 
 // program -> statement* EOF
@@ -167,6 +198,18 @@ ASTNode *parse_should_stmt(Parser *parser);
 
 // whilstStmt -> "whilst" "(" equality ")" block
 ASTNode *parse_whilst_stmt(Parser *parser);
+
+// makeFnStmt  ::= "make" IDENTIFER "(" paramList ")" block
+ASTNode *parse_make_fn_stmt(Parser *parser);
+
+// callFnStmt  ::= IDENTIFIER "(" argList ")"
+ASTNode *parse_call_fn_stmt(Parser *parser);
+
+// paramList   ::= (IDENTIFER ("," IDENTIFER)*)?
+ASTNode *parse_param_list(Parser *parser);
+
+// argList     ::= (expression ("," expression)*)?
+ASTNode *parse_arg_list(Parser *parser);
 
 // block -> "{" statement* "}"
 ASTNode *parse_block(Parser *parser);

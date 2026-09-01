@@ -87,6 +87,16 @@ Value eval(ASTNode *node, Environment *env, int block_id) {
     execute_stmt(node, env, block_id);
     break;
   }
+  case NODE_MAKE_FN: {
+    execute_stmt(node, env, block_id);
+    break;
+  }
+  case NODE_CALL_FN: {
+    int block_scope = get_block_id(env);
+    ret = eval_expr(node, env, block_scope);
+    remove_by_block(&env->store, block_scope);
+    break;
+  }
   default:
     break;
   }
@@ -149,6 +159,23 @@ Value eval_expr(ASTNode *node, Environment *env, int block_id) {
                           new_value, block_id);
 
   } break;
+  case NODE_CALL_FN: {
+    Value fn = eval(node->as.call_fn_stmt.fn_name, env, block_id);
+    if (fn.type != VAL_FN)
+      throw_interpreter_error("Error: variable is not callable");
+    // we create the parameter names
+    if (node->as.call_fn_stmt.args->as.args.count !=
+        fn.as.fn->params->as.params.count)
+      throw_interpreter_error("Error: arg count and param count mismatch");
+    for (size_t i = 0; i < fn.as.fn->params->as.params.count; i++) {
+      Value val =
+          eval(node->as.call_fn_stmt.args->as.args.args[i], env, block_id);
+      create_value(env,
+                   fn.as.fn->params->as.params.params[i]->as.identifier.value,
+                   val, block_id);
+    }
+    value = eval(fn.as.fn->body, env, block_id);
+  } break;
   default:
     break;
   }
@@ -191,6 +218,12 @@ void execute_stmt(ASTNode *node, Environment *env, int block_id) {
       eval(node->as.whilst_stmt.body, env, block_id);
       condition = eval(node->as.whilst_stmt.condition, env, block_id);
     }
+  } break;
+  case NODE_MAKE_FN: {
+    Value fn = (Value){.type = VAL_FN};
+    fn.as.fn = &node->as.make_fn_stmt;
+    create_value(env, node->as.make_fn_stmt.fn_name->as.identifier.value, fn,
+                 block_id);
   } break;
   default:
     break;
