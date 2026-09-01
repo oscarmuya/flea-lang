@@ -73,7 +73,7 @@ Token *tokenize(const char *source, int *token_count) {
         tokens[(*token_count)++].type = VALUE_BE;
       } else if (strcmp(string, "should") == 0) {
         tokens[(*token_count)++].type = VALUE_SHOULD;
-      } else if (strcmp(string, "then") == 0) {
+      } else if (strcmp(string, "otherwise") == 0) {
         tokens[(*token_count)++].type = VALUE_THEN;
       } else if (strcmp(string, "whilst") == 0) {
         tokens[(*token_count)++].type = VALUE_WHILST;

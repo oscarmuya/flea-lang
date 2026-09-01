@@ -15,7 +15,7 @@ whilst (x < y) {
 
 should (x <= 10){
     print "Yay its more!";
-} then {
+} otherwise {
     print "Nay its less!";
 }
 

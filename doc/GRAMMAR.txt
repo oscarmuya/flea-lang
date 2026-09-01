@@ -7,7 +7,7 @@ callFnStmt  ::= IDENTIFIER "(" argList ")" ";"
 printStmt   ::= "print" equality ";"
 makeStmt    ::= "make" expression ";"
 exprStmt    ::= expression ";"
-shouldStmt  ::= "should" "(" equality ")" block ("then" block)?
+shouldStmt  ::= "should" "(" equality ")" block ("otherwise" block)?
 whilstStmt  ::= "whilst" "(" equality ")" block
 block       ::= "{" statement* "}"
 
