@@ -6,12 +6,13 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-typedef enum { VAL_NUMBER, VAL_STRING, VAL_BOOL, VAL_NIL, VAL_FN } ValueType;
+typedef enum { VAL_NUMBER, VAL_STRING, VAL_BOOL, VAL_NIL, VAL_FN, VAL_FLOAT } ValueType;
 
 typedef struct {
   ValueType type;
   union {
     int32_t integer;
+    double flt;
     char *string;
     bool boolean;
     MakeFnNode *fn;

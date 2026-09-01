@@ -6,6 +6,7 @@
 #include "../include/store.h"
 #include <assert.h>
 #include <stdarg.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,31 +25,17 @@ Value eval(ASTNode *node, Environment *env, int block_id) {
     }
     break;
   }
-  case NODE_NUMBER: {
-    ret = eval_value(node, env);
-    break;
-  }
-  case NODE_STRING: {
-    ret = eval_value(node, env);
-    break;
-  }
-  case NODE_BOOLEAN: {
-    ret = eval_value(node, env);
-    break;
-  }
+  case NODE_NUMBER:
+  case NODE_FLOAT:
+  case NODE_STRING:
+  case NODE_BOOLEAN:
   case NODE_IDENTIFIER: {
     ret = eval_value(node, env);
     break;
   }
-  case NODE_UNARY: {
-    ret = eval_expr(node, env, block_id);
-    break;
-  }
-  case NODE_BINARY: {
-    ret = eval_expr(node, env, block_id);
-    break;
-  }
-    // INFO: My lang my choice i will evaluate an assign as an expression like C
+  case NODE_UNARY:
+  case NODE_BINARY:
+  // INFO: My lang my choice i will evaluate an assign as an expression like C
   case NODE_BE: {
     ret = eval_expr(node, env, block_id);
     break;
@@ -75,18 +62,14 @@ Value eval(ASTNode *node, Environment *env, int block_id) {
       printf("%s\n", value.as.string);
     else if (value.type == VAL_BOOL)
       printf("%s\n", value.as.boolean ? "true" : "false");
+    else if (value.type == VAL_FLOAT)
+      printf("%f\n", value.as.flt);
     else
       printf("NULL\n");
     break;
   }
-  case NODE_SHOULD: {
-    execute_stmt(node, env, block_id);
-    break;
-  }
-  case NODE_WHILST: {
-    execute_stmt(node, env, block_id);
-    break;
-  }
+  case NODE_SHOULD:
+  case NODE_WHILST:
   case NODE_MAKE_FN: {
     execute_stmt(node, env, block_id);
     break;
@@ -118,8 +101,8 @@ Value eval_expr(ASTNode *node, Environment *env, int block_id) {
     if (left.type == VAL_NIL || right.type == VAL_NIL)
       throw_interpreter_error("Error: Cant operate on value NULL");
 
-    if (left.type == VAL_NUMBER)
-      value = operate_on_integers(&left, &right, node->as.binary.op);
+    if (left.type == VAL_NUMBER || left.type == VAL_FLOAT)
+      value = operate_on_numbers(&left, &right, node->as.binary.op);
     else if (left.type == VAL_STRING)
       value = operate_on_strings(&left, &right, node->as.binary.op, env);
     else if (left.type == VAL_BOOL)
@@ -132,6 +115,8 @@ Value eval_expr(ASTNode *node, Environment *env, int block_id) {
         throw_interpreter_error("Error: cannot perform operation on numbers");
       } else if (operand.type == VAL_STRING) {
         throw_interpreter_error("Error: cannot perform operation on string");
+      } else if (operand.type == VAL_FLOAT) {
+        throw_interpreter_error("Error: cannot perform operation on floats");
       } else if (operand.type == VAL_BOOL) {
         value.type = VAL_BOOL;
         value.as.boolean = operand.as.boolean == true ? false : true;
@@ -140,6 +125,9 @@ Value eval_expr(ASTNode *node, Environment *env, int block_id) {
       if (operand.type == VAL_NUMBER) {
         value.type = VAL_NUMBER;
         value.as.integer = operand.as.integer * -1;
+      } else if (operand.type == VAL_FLOAT) {
+        value.type = VAL_FLOAT;
+        value.as.flt = operand.as.flt * -1.0f;
       } else if (operand.type == VAL_STRING) {
         throw_interpreter_error("Error: cannot perform operation on string");
       } else if (operand.type == VAL_BOOL) {
@@ -252,6 +240,10 @@ Value eval_value(ASTNode *node, Environment *env) {
     value.type = VAL_NUMBER;
     value.as.integer = node->as.number.value;
   } break;
+  case NODE_FLOAT: {
+    value.type = VAL_FLOAT;
+    value.as.flt = node->as.flt.value;
+  } break;
   case NODE_BOOLEAN: {
     value.type = VAL_BOOL;
     value.as.boolean = node->as.boolean.value;
@@ -262,37 +254,61 @@ Value eval_value(ASTNode *node, Environment *env) {
   return value;
 }
 
-Value operate_on_integers(Value *left, Value *right, TokenType op) {
+double get_number_available(Value *input) {
+  if (input->type == VAL_NUMBER) {
+    return (double)input->as.integer;
+  } else if (input->type == VAL_FLOAT) {
+    return input->as.flt;
+  }
+  return 0.0;
+}
+
+Value operate_on_numbers(Value *left, Value *right, TokenType op) {
   Value value = (Value){.type = VAL_NIL};
-  value.type = left->type;
+  ValueType left_type = left->type;
+  double left_value = get_number_available(left);
+  double right_value = get_number_available(right);
+  value.type = left_type;
   if (op == VALUE_MINUS) {
-    value.as.integer = left->as.integer - right->as.integer;
+    if (left_type == VAL_FLOAT)
+      value.as.flt = left_value - right_value;
+    else
+      value.as.integer = (int32_t)(left_value - right_value);
   } else if (op == VALUE_PLUS) {
-    value.as.integer = left->as.integer + right->as.integer;
+    if (left_type == VAL_FLOAT)
+      value.as.flt = left_value + right_value;
+    else
+      value.as.integer = (int32_t)(left_value + right_value);
   } else if (op == VALUE_ASTERIK) {
-    value.as.integer = left->as.integer * right->as.integer;
+    if (left_type == VAL_FLOAT)
+      value.as.flt = left_value * right_value;
+    else
+      value.as.integer = (int32_t)(left_value * right_value);
   } else if (op == VALUE_FORWARD_SLASH) {
-    value.as.integer = left->as.integer / right->as.integer;
+    if (left_type == VAL_FLOAT)
+      value.as.flt = left_value / right_value;
+    else
+      value.as.integer = (int32_t)(left_value / right_value);
   } else if (op == VALUE_EQUALS) {
     value.type = VAL_BOOL;
-    value.as.boolean = left->as.integer == right->as.integer;
+    value.as.boolean = left_value == right_value;
   } else if (op == VALUE_NOT_EQUALS) {
     value.type = VAL_BOOL;
-    value.as.boolean = left->as.integer != right->as.integer;
+    value.as.boolean = left_value != right_value;
   } else if (op == VALUE_LESS_THAN) {
     value.type = VAL_BOOL;
-    value.as.boolean = left->as.integer < right->as.integer;
+    value.as.boolean = left_value < right_value;
   } else if (op == VALUE_LESS_THAN_EQUALS) {
     value.type = VAL_BOOL;
-    value.as.boolean = left->as.integer <= right->as.integer;
+    value.as.boolean = left_value <= right_value;
   } else if (op == VALUE_GREATER_THAN) {
     value.type = VAL_BOOL;
-    value.as.boolean = left->as.integer > right->as.integer;
+    value.as.boolean = left_value > right_value;
   } else if (op == VALUE_GREATER_THAN_EQUALS) {
     value.type = VAL_BOOL;
-    value.as.boolean = left->as.integer >= right->as.integer;
+    value.as.boolean = left_value >= right_value;
   } else {
-    throw_interpreter_error("Error: integer operation %s not allowed",
+    throw_interpreter_error("Error: number operation %s not allowed",
                             token_type_to_string(op));
   }
   return value;

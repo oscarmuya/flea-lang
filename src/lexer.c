@@ -35,8 +35,23 @@ Token *tokenize(const char *source, int *token_count) {
         integer = integer * 10 + (source[count] - '0');
         count++;
       }
-      tokens[*token_count].type = VALUE_NUMBER;
-      tokens[*token_count].value.i = integer;
+      // check if there is a floating part
+      double fl = 0.0;
+      double divisor = 10;
+      if (source[count] == '.') {
+        count++;
+        while (isdigit((unsigned char)source[count])) {
+          fl = fl + (double)(source[count] - '0') / divisor;
+          divisor *= 10.0;
+          count++;
+        }
+        double f = (double)integer;
+        tokens[*token_count].type = VALUE_FLOAT;
+        tokens[*token_count].value.f = f + fl;
+      } else {
+        tokens[*token_count].type = VALUE_NUMBER;
+        tokens[*token_count].value.i = integer;
+      }
       *token_count += 1;
       continue;
     }
@@ -233,6 +248,10 @@ void visualize_tokens(Token *tokens, int *token_count) {
       printf("NUMBER(%d)\n", tokens[i].value.i);
       break;
 
+    case VALUE_FLOAT:
+      printf("FLOAT(%f)\n", tokens[i].value.f);
+      break;
+
     case VALUE_STRING:
       printf("STRING(\"%s\")\n", tokens[i].value.s);
       break;
@@ -352,6 +371,8 @@ const char *token_type_to_string(TokenType type) {
     return "VALUE_IDENTIFIER";
   case VALUE_NUMBER:
     return "VALUE_NUMBER";
+  case VALUE_FLOAT:
+    return "VALUE_FLOAT";
   case VALUE_STRING:
     return "VALUE_STRING";
   case VALUE_BOOL:

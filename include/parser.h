@@ -10,6 +10,7 @@ typedef enum {
   NODE_PROGRAM,
 
   NODE_NUMBER,
+  NODE_FLOAT,
   NODE_STRING,
   NODE_BOOLEAN,
   NODE_IDENTIFIER,
@@ -41,6 +42,10 @@ typedef struct {
 typedef struct {
   int32_t value;
 } NumberNode;
+
+typedef struct {
+  double value;
+} FloatNode;
 
 typedef struct {
   char *value;
@@ -126,6 +131,7 @@ struct ASTNode {
     ProgramNode program;
 
     NumberNode number;
+    FloatNode flt;
     StringNode string;
     BooleanNode boolean;
     IdentifierNode identifier;

@@ -2,6 +2,12 @@
 print 200 + 150;
 // EXPECTED: 350
 
+print 200.234 + 150.0001;
+// EXPECTED: 350.234100
+
+print 200.0 / 3;
+// EXPECTED: 66.666667
+
 print 200 - 150;
 // EXPECTED: 50
 
@@ -11,8 +17,8 @@ print 2 + 3 * 4 - 1;
 print 200 * 150;
 // EXPECTED: 30000
 
-// print 200 / 150;
-// TOADD: 1.3333333333
+print 200.0 / 150;
+// EXPECTED: 1.333333
 
 // print 200 % 150;
 // TOADD: 50

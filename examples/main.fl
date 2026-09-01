@@ -1,12 +1,5 @@
-// this is a comment!
-
-make x be 10;
-
 make pay(amount,count){
-    print "i am paying";
-    print amount + count;
+    print 200.0 / 3;
 }
 
-pay(200,20);
-
-// this is also comment!
+pay(200.234,20);

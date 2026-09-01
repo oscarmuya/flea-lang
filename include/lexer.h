@@ -11,6 +11,7 @@ typedef enum {
   VALUE_IDENTIFIER,
 
   VALUE_NUMBER,
+  VALUE_FLOAT,
   VALUE_STRING,
   VALUE_BOOL,
 
@@ -47,10 +48,14 @@ typedef enum {
 
 typedef struct Token Token;
 
+// wanted to add float too many things to do in terms of conversions yeah just
+// slapped in a double and let it bother me another day
+// FIX: bad dev move 
 struct Token {
   TokenType type;
   union {
     int32_t i;
+    double f;
     char *s;
     bool b;
   } value;

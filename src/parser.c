@@ -514,6 +514,11 @@ ASTNode *parse_primary(Parser *parser) {
     primary->type = NODE_NUMBER;
     primary->as.number.value = advance(parser)->value.i;
     break;
+  case VALUE_FLOAT:
+    primary = arena_alloc(parser->arena, sizeof(*primary));
+    primary->type = NODE_FLOAT;
+    primary->as.flt.value = advance(parser)->value.f;
+    break;
   case VALUE_STRING:
     primary = arena_alloc(parser->arena, sizeof(*primary));
     primary->type = NODE_STRING;
@@ -572,6 +577,8 @@ const char *node_type_to_string(NodeType type) {
     return "NODE_PROGRAM";
   case NODE_NUMBER:
     return "NODE_NUMBER";
+  case NODE_FLOAT:
+    return "NODE_FLOAT";
   case NODE_STRING:
     return "NODE_STRING";
   case NODE_BOOLEAN:

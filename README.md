@@ -6,6 +6,7 @@
 make x be 5;
 make y be 10;
 make z be "hello" + " world!";
+make a be 10.23476;
 
 whilst (x < y) {
     print x;
@@ -23,7 +24,7 @@ make pay(amount, count) {
     print amount + count;
 }
 
-pay(200, 20);
+pay(200.234, 20);
 
 // this is a comment
 ```
